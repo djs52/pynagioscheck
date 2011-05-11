@@ -10,7 +10,7 @@ class RedisCheck(NagiosCheck):
     .. _Redis: http://redis.io/
 
     """
-    version = '0.1.0'
+    version = '0.1.1'
 
     def __init__(self):
         NagiosCheck.__init__(self)
@@ -31,7 +31,7 @@ class RedisCheck(NagiosCheck):
             raise Status('critical', str(e))
         raise Status('ok', (
           'Redis is up',
-          'Redis version %s has been running for %s' %
+          'Redis version %s has been up for %s' %
             (info['redis_version'],
              prettyprint_seconds_elapsed(info['uptime_in_seconds']))
         ))
