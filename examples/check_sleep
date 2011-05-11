@@ -9,7 +9,7 @@ class SleepCheck(NagiosCheck):
     behaviour.
     
     """
-    version = '0.1.0'
+    version = '0.1.1'
 
     def __init__(self):
         NagiosCheck.__init__(self)
@@ -21,6 +21,8 @@ class SleepCheck(NagiosCheck):
         f = open('/tmp/SleepCheck', 'w')
         print >>f, str(datetime.datetime.now())
         f.close()
+
+        NagiosCheck.expired(self)
 
     def check(self, opts, args):
         sleep_for = 30
