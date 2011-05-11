@@ -16,8 +16,8 @@ scripts (or 'plug-ins', as Nagios refers to them).
 Service check scripts that properly utilise a library will behave and
 interface more consistently than those that do not. pynagioscheck
 strives to conform to the practices described in the Nagios Plug-in
-Development Guidelines and, more importantly, save you system
-administrators precious, precious time.
+Development Guidelines and, more importantly, save valuable system
+administrator time.
     """,
     license = 'BSD',
     platforms = [ 'Linux', 'Unix' ],

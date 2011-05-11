@@ -8,8 +8,8 @@ scripts (or 'plug-ins', as Nagios refers to them).
 Service check scripts that properly utilise a library will behave and
 interface more consistently than those that do not.  `pynagioscheck` 
 strives to conform to the practices described in the `Nagios Plug-in 
-Development Guidelines`_ and, more importantly, save you system 
-administrators precious, precious time.
+Development Guidelines`_ and, more importantly, save valuable system 
+administrator time.
 
 .. _`Nagios Plug-in Development Guidelines`: http://nagiosplug.sourceforge.net/developer-guidelines.html
 
