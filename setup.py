@@ -13,7 +13,7 @@ setup(
 pynagioscheck is a Python library for writing Nagios service check
 scripts (or 'plug-ins', as Nagios refers to them).
 
-Service check scripts that properly utilise this library will behave and
+Service check scripts that properly utilise a library will behave and
 interface more consistently than those that do not. pynagioscheck
 strives to conform to the practices described in the Nagios Plug-in
 Development Guidelines and, more importantly, save you system
