@@ -8,6 +8,7 @@ setup(
     version = nagioscheck.__version__,
     author = 'Saj Goonatilleke',
     author_email = 'sg@redu.cx',
+
     description = 'A Python library for Nagios plug-in developers',
     long_description = """
 pynagioscheck is a Python library for Nagios plug-in developers.
