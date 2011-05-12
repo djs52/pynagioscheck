@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 import datetime
 import gc
@@ -8,6 +8,7 @@ import optparse
 import os
 import signal
 import sys
+import traceback
 
 class NagiosCheck:
     """Subclass me and override `check()` to define your own Nagios
@@ -131,9 +132,14 @@ class Status(Exception):
         list, the individual items should correspond to::
 
             msg[0]: A single line summary;
+
             msg[1]: Single line with additional information;
+
             msg[2]: Multi-line output for configuration debugging;
-            msg[3]: Multi-line output for check script debugging.
+
+            msg[3]: Multi-line output for check script debugging.  This
+            item is automatically filled with a Python backtrace.  Use
+            -vvv at the command line to view it.
 
         All four list elements are not mandatory.  Requests for verbose
         output will fall upwards until a suitable message is found.  For
@@ -171,15 +177,18 @@ class Status(Exception):
               'Expected an int or str as status, but got %r instead' %
               status)
 
-        self.msg = []
+        self.msg = [None] * 4
         if isinstance(msg, str):
-            self.msg.append(msg)
+            self.msg[0] = msg
         elif isinstance(msg, list) or isinstance(msg, tuple):
             for i in range(4):
                 try:
-                    self.msg.append(str(msg[i]))
+                    self.msg[i] = str(msg[i])
                 except IndexError:
-                    self.msg.append(None)
+                    pass
+        if self.msg[3] is None:
+            self.msg[3] = '\n'.join((self.search_msg(1), '',
+              ''.join(traceback.format_tb(sys.exc_info()[2]))))
 
         self.perfdata = perfdata
 
@@ -192,11 +201,15 @@ class Status(Exception):
         return self.output()
 
     def output(self, verbosity=0):
+        return '%s: %s' % (
+          self.i_map[self.status], self.search_msg(verbosity))
+
+    def search_msg(self, verbosity=0):
         if verbosity not in range(4):
             raise ValueError('Verbosity should be one of 0, 1, 2, or 3')
-        while self.msg[verbosity] == None:
+        while self.msg[verbosity] is None and verbosity > 0:
             verbosity -= 1
-        return '%s: %s' % (self.i_map[self.status], self.msg[verbosity])
+        return self.msg[verbosity]
 
 def _handle_sigterm(signum, frame):
     checks = filter(

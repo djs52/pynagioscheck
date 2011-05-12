@@ -8,13 +8,12 @@ setup(
     version = nagioscheck.__version__,
     author = 'Saj Goonatilleke',
     author_email = 'sg@redu.cx',
-    description = 'A Python library for writing Nagios service check scripts',
+    description = 'A Python library for Nagios plug-in developers',
     long_description = """
-pynagioscheck is a Python library for writing Nagios service check
-scripts (or 'plug-ins', as Nagios refers to them).
+pynagioscheck is a Python library for Nagios plug-in developers.
 
 Service check scripts that properly utilise a library will behave and
-interface more consistently than those that do not. pynagioscheck
+interface more consistently than those that do not.  pynagioscheck
 strives to conform to the practices described in the Nagios Plug-in
 Development Guidelines and, more importantly, save valuable system
 administrator time.

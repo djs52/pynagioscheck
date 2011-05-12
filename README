@@ -2,11 +2,10 @@
 pynagioscheck
 =============
 
-`pynagioscheck` is a Python library for writing Nagios service check 
-scripts (or 'plug-ins', as Nagios refers to them).
+``pynagioscheck`` is a Python library for Nagios plug-in developers.
 
-Service check scripts that properly utilise a library will behave and
-interface more consistently than those that do not.  `pynagioscheck` 
+Nagios plug-ins that properly utilise a library will behave and 
+interface more consistently than those that do not.  ``pynagioscheck`` 
 strives to conform to the practices described in the `Nagios Plug-in 
 Development Guidelines`_ and, more importantly, save valuable system 
 administrator time.
@@ -17,56 +16,56 @@ administrator time.
 Usage
 -----
 
-Check `examples/` for a jump start.
+Check ``examples/`` for a jump start.
 
 The long version:
 
-    1. Subclass `nagioscheck.NagiosCheck` as `YourCheck`.
+    1. Subclass ``nagioscheck.NagiosCheck`` as ``YourCheck``.
 
-    #. Set `YourCheck.version`.  I prefer the `major.minor.patch` 
+    #. Set ``YourCheck.version``.  I prefer the ``major.minor.patch`` 
        format, but you can use whatever you like.  Increment this 
        version number with every revision to your check script.
 
     #. If your check script takes mandatory arguments, describe them in  
-       `YourCheck.usage`.  Arguments are not the same as options.  
+       ``YourCheck.usage``.  Arguments are not the same as options.  
        e.g.::
 
            YourCheck.usage = '[options] HOST PORT'
 
-    #. From `YourCheck.__init__()`, invoke `NagiosCheck.__init__(self)` 
+    #. From ``YourCheck.__init__()``, invoke ``NagiosCheck.__init__(self)`` 
        before you do anything else.
 
-    #. Let `NagiosCheck` know about any optional arguments you might 
-       want to parse with `NagiosCheck.add_option()`.  It makes the most 
-       sense to do this from inside `YourCheck.__init__()`.
+    #. Let ``NagiosCheck`` know about any optional arguments you might 
+       want to parse with ``NagiosCheck.add_option()``.  It makes the most 
+       sense to do this from inside ``YourCheck.__init__()``.
 
-    #. Define a `YourCheck.check()` method that will implement your 
+    #. Define a ``YourCheck.check()`` method that will implement your 
        actual service check.  This method takes two arguments:
 
-       a. `opts`: An instance of `optparse.Values`.
+       a. ``opts``: An instance of ``optparse.Values``.
        
           Suppose an option is registered with::
 
               self.add_option('H', 'host', 'host', 'Hostname or ...')
 
-          then, if the user supplies a hostname with `-H HOST` or 
-          `--host HOST` at the command line, the option argument 
-          (`HOST`) will be available from inside the `check()` method 
+          then, if the user supplies a hostname with ``-H HOST`` or 
+          ``--host HOST`` at the command line, the option argument 
+          (``HOST``) will be available from inside the ``check()`` method 
           as::
 
               host = getattr(opts, 'host')
 
-          Option argument attributes will be `None` if the option was 
+          Option argument attributes will be ``None`` if the option was 
           not supplied at the command line.
 
-       #. `args`: A list of mandatory postitional arguments.  This list 
-          should match the usage information in `YourCheck.usage`.
+       #. ``args``: A list of mandatory postitional arguments.  This list 
+          should match the usage information in ``YourCheck.usage``.
 
-       `YourCheck.check()` *must* raise `nagioscheck.Status` as soon as 
-       the result of the service check is known.  `YourCheck.check()` 
+       ``YourCheck.check()`` *must* raise ``nagioscheck.Status`` as soon as 
+       the result of the service check is known.  ``YourCheck.check()`` 
        *must not* return.  See the examples and source for details.
 
-    #. With `YourCheck` defined, instantiate and make it go with::
+    #. With ``YourCheck`` defined, instantiate and make it go with::
 
            if __name__ == '__main__':
                YourCheck().run() 
@@ -97,16 +96,27 @@ What you get for free
                                   kill((pid_t)(-pid),SIGKILL);
                                   }
 
-      See `NagiosCheck.expired()` for details.
+      See ``NagiosCheck.expired()`` for details.
 
-    - `-v` works out of the box.  Supply it more than once for 
+    - ``-v`` works out of the box.  Supply it more than once for 
       additional verbosity.  There are four levels in total.  You 
       control what is output at each level with your arguments to 
-      `nagioscheck.Status()`.  See the examples and source for details.
+      ``nagioscheck.Status()``.  See the examples and source for 
+      details.  Use ``-vvv`` to view a backtrace of your check script to 
+      the point where it raised ``NagiosCheck.Status``::
 
-    - `-h` and `--help` work out of the box.
+          % check_redis -vvv
+          CRITICAL: Error 61 connecting 127.0.0.1:6379. Connection refused.
 
-    - `--version` works out of the box.
+            File "./check_redis", line 29, in check
+              info = r.info()
+            File "build/bdist.macosx-10.6-universal/egg/redis/client.py", line 380, in info
+              return self.execute_command('INFO')
+            [...]
+
+    - ``-h`` and ``--help`` work out of the box.
+
+    - ``--version`` works out of the box.
 
 
 What you probably should get for free, but don't
