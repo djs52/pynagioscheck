@@ -9,15 +9,13 @@ setup(
     author = 'Saj Goonatilleke',
     author_email = 'sg@redu.cx',
 
-    description = 'A Python library for Nagios plug-in developers',
+    description = 'A Python framework for Nagios plug-in developers',
     long_description = """
-pynagioscheck is a Python library for Nagios plug-in developers.
+pynagioscheck is a Python framework for Nagios plug-in developers.
 
-Service check scripts that properly utilise a library will behave and
-interface more consistently than those that do not.  pynagioscheck
-strives to conform to the practices described in the Nagios Plug-in
-Development Guidelines and, more importantly, save valuable system
-administrator time.
+pynagioscheck strives to conform to the practices described in the
+Nagios Plug-in Development Guidelines and, more importantly, save
+valuable system administrator time.
     """,
     license = 'BSD',
     platforms = [ 'Linux', 'Unix' ],

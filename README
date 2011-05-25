@@ -2,13 +2,11 @@
 pynagioscheck
 =============
 
-``pynagioscheck`` is a Python library for Nagios plug-in developers.
+``pynagioscheck`` is a Python framework for Nagios plug-in developers.
 
-Nagios plug-ins that properly utilise a library will behave and 
-interface more consistently than those that do not.  ``pynagioscheck`` 
-strives to conform to the practices described in the `Nagios Plug-in 
-Development Guidelines`_ and, more importantly, save valuable system 
-administrator time.
+``pynagioscheck`` strives to conform to the practices described in the 
+`Nagios Plug-in Development Guidelines`_ and, more importantly, save 
+valuable system administrator time.
 
 .. _`Nagios Plug-in Development Guidelines`: http://nagiosplug.sourceforge.net/developer-guidelines.html
 
