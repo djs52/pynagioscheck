@@ -1,2 +1,3 @@
+build/
 dist/*.tar.gz
 MANIFEST

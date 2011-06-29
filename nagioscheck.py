@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 
 import datetime
 import gc
@@ -183,7 +183,10 @@ class Status(Exception):
         elif isinstance(msg, list) or isinstance(msg, tuple):
             for i in range(4):
                 try:
-                    self.msg[i] = str(msg[i])
+                    if msg[i] is None:
+                        self.msg[i] = None
+                    else:
+                        self.msg[i] = str(msg[i])
                 except IndexError:
                     pass
         if self.msg[3] is None:
