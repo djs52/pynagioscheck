@@ -1,3 +1,9 @@
+nagioscheck (0.1.2-1) unstable; urgency=low
+
+  * Sync to upstream.
+
+ -- Saj Goonatilleke <sg@redu.cx>  Wed, 29 Jun 2011 12:33:14 +1000
+
 nagioscheck (0.1.1-1) unstable; urgency=low
 
   * Initial release.
