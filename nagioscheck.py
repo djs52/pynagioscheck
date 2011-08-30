@@ -5,10 +5,24 @@ __version__ = '0.1.2'
 import datetime
 import gc
 import optparse
-import os
 import signal
 import sys
 import traceback
+
+class UsageError(Exception):
+    """Raise me from inside your check() method if the user has not 
+    supplied enough information to proceed.
+
+    """
+    def __init__(self, msg=""):
+        self.msg = str(msg)
+
+    def __repr__(self):
+        return '%s.%s(msg=%r)' % (
+          self.__module__, self.__class__.__name__, self.msg)
+
+    def __str__(self):
+        return self.msg
 
 class NagiosCheck:
     """Subclass me and override `check()` to define your own Nagios
@@ -93,7 +107,13 @@ class NagiosCheck:
                 raise Status('unknown',
                   '%s.check() returned without raising %s.Status' %
                   (self.__class__.__name__, __name__))
-            except Status, s:
+            except UsageError, e:
+                msg = str(e)
+                if msg != "":
+                    print >>sys.stderr, "%s\n" % msg
+                self.parser.print_usage()
+                sys.exit(2)
+            except Status, e:
                 raise
             except Exception, e:
                 raise Status('unknown',
