@@ -115,9 +115,11 @@ class NagiosCheck:
                 sys.exit(2)
             except Status, e:
                 raise
+            except SystemExit, e:
+                sys.exit(e.code)
             except Exception, e:
-                raise Status('unknown',
-                  'Unhandled Python exception: %r' % e)
+                raise Status(
+                  'unknown', 'Unhandled Python exception: %r' % e)
             sys.exit(Status.EXIT_UNKNOWN)
         except Status, s:
             print s.output(self.verbosity)
