@@ -226,8 +226,11 @@ class Status(Exception):
         return self.output()
 
     def output(self, verbosity=0):
-        return '%s: %s' % (
+        output = '%s: %s' % (
           self.i_map[self.status], self.search_msg(verbosity))
+        if self.perfdata is not None:
+          output += ' | %s' % self.perfdata
+        return output
 
     def search_msg(self, verbosity=0):
         if verbosity not in range(4):
