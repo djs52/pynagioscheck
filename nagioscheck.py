@@ -229,7 +229,12 @@ class Status(Exception):
         output = '%s: %s' % (
           self.i_map[self.status], self.search_msg(verbosity))
         if self.perfdata is not None:
-          output += ' | %s' % self.perfdata
+            output += ' |'
+            if not isinstance(self.perfdata, basestring):
+                for data in self.perfdata:
+                    output += ' %s' % data
+            else:
+                output += ' %s' % self.perfdata
         return output
 
     def search_msg(self, verbosity=0):
@@ -238,6 +243,36 @@ class Status(Exception):
         while self.msg[verbosity] is None and verbosity > 0:
             verbosity -= 1
         return self.msg[verbosity]
+
+class PerformanceMetric:
+    """
+    Class for storing individual performance data (perfdata) metrics.
+
+
+    A collection of these objects can be passed as the perfdata
+    parameter to Status to include perfdata in your check output.
+    """
+
+    def __init__(self, label, value, unit, warning_threshold='',
+    critical_threshold='', minimum='', maximum=''):
+        self.label = label
+        self.value = value
+        self.unit = unit
+        self.warning_threshold = warning_threshold
+        self.critical_threshold = critical_threshold
+        self.minimum = minimum
+        self.maximum = maximum
+
+    def __str__(self):
+        return self.output()
+
+    def __repr__(self):
+        return self.output()
+
+    def output(self):
+        return '%s=%s%s;%s;%s;%s;%s;' % (self.label, self.value,
+        self.unit, self.warning_threshold, self.critical_threshold,
+        self.minimum, self.maximum)
 
 def _handle_sigterm(signum, frame):
     checks = filter(
