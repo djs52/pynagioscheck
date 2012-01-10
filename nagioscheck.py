@@ -134,12 +134,14 @@ class Status(Exception):
 
         Status(nagioscheck.Status.EXIT_OK, 'Happy days')
 
+    - Or with perfdata::
+
+        Status(nagioscheck.Status.EXIT_OK, 'Happy days',
+        PerformanceMetric('Power Level', 9001, 'points'))
+
     - This, less verbose, alternative is also acceptable::
 
         Status('ok', 'Happy days')
-
-    Nagios perfdata is not (yet) supported.  (I don't use Nagios for
-    performance monitoring.)
 
     """
     EXIT_OK = 0
@@ -169,7 +171,9 @@ class Status(Exception):
         verbosity level 1 (`msg[1]`) is requested, the string from
         `msg[0]` will be returned.
 
-        `perfdata` is currently ignored.
+        Perfdata is optional and can be supplied as a single object or
+        a collection. PerformanceMetric exists to abstract the textual
+        formatting of the perfdata string.
 
         """
         # This contraption generates a dictionary of valid status 

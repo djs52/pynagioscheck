@@ -124,11 +124,6 @@ What you probably should get for free, but don't
 
     - Threshold helpers.
 
-    - Perfdata helpers.  (I work at sites that only use Nagios for 
-      availability monitoring, so this feature is unlikely to ever 
-      appear.)
-
-
 Author
 ------
 
