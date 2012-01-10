@@ -230,11 +230,8 @@ class Status(Exception):
           self.i_map[self.status], self.search_msg(verbosity))
         if self.perfdata is not None:
             output += ' |'
-            if not isinstance(self.perfdata, basestring):
-                for data in self.perfdata:
-                    output += ' %s' % data
-            else:
-                output += ' %s' % self.perfdata
+            for data in self.perfdata:
+                output += ' %s' % data
         return output
 
     def search_msg(self, verbosity=0):
