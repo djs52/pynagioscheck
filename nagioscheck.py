@@ -18,7 +18,7 @@ class UsageError(Exception):
         self.msg = str(msg)
 
     def __repr__(self):
-        return '%s.%s(msg=%r)' % (
+        return "%s.%s(msg=%r)" % (
           self.__module__, self.__class__.__name__, self.msg)
 
     def __str__(self):
@@ -37,14 +37,14 @@ class NagiosCheck:
     - `NagiosCheck.check()`: Actual check logic.
 
     """
-    usage = '[options]'
+    usage = "[options]"
     version = '0.1.0'
 
     def __init__(self):
         self.options = []
         self.parser = optparse.OptionParser(
-          usage='%%prog %s' % self.usage,
-          version='%%prog %s' % self.version)
+          usage="%%prog %s" % self.usage,
+          version="%%prog %s" % self.version)
 
         # All checks must implement the following options as per the 
         # Nagios plug-in development guidelines.
@@ -69,7 +69,7 @@ class NagiosCheck:
         self.parser.add_option(*option_strings, **kwargs)
 
     def check(self, opts, args):
-        raise NotImplementedError('You forgot to override check()!')
+        raise NotImplementedError("You forgot to override check()!")
 
     def expired(self):
         """Our parent has died.  Follow suit.
@@ -105,7 +105,7 @@ class NagiosCheck:
                 signal.signal(signal.SIGTERM, old_handler)
 
                 raise Status('unknown',
-                  '%s.check() returned without raising %s.Status' %
+                  "%s.check() returned without raising %s.Status" %
                   (self.__class__.__name__, __name__))
             except UsageError, e:
                 msg = str(e)
@@ -119,7 +119,7 @@ class NagiosCheck:
                 sys.exit(e.code)
             except Exception, e:
                 raise Status(
-                  'unknown', 'Unhandled Python exception: %r' % e)
+                  'unknown', "Unhandled Python exception: %r" % e)
             sys.exit(Status.EXIT_UNKNOWN)
         except Status, s:
             print s.output(self.verbosity)
@@ -132,16 +132,16 @@ class Status(Exception):
 
     - Without perfdata::
 
-        Status(nagioscheck.Status.EXIT_OK, 'Happy days')
+        Status(nagioscheck.Status.EXIT_OK, "Happy days")
 
-    - Or with perfdata::
+    - With perfdata::
 
-        Status(nagioscheck.Status.EXIT_OK, 'Happy days',
+        Status(nagioscheck.Status.EXIT_OK, "Happy days",
         PerformanceMetric('Power Level', 9001, 'points'))
 
     - This, less verbose, alternative is also acceptable::
 
-        Status('ok', 'Happy days')
+        Status('ok', "Happy days")
 
     """
     EXIT_OK = 0
@@ -181,7 +181,7 @@ class Status(Exception):
         # very top of this class.  We use this dict for validation, and 
         # as a shortcut mechanism when a string is supplied as `status`.
         self.s_map = dict(
-          map(lambda x: (x.replace('EXIT_', ''), getattr(Status, x),),
+          map(lambda x: (x.replace('EXIT_', ""), getattr(Status, x),),
           filter(lambda x: x.startswith('EXIT_'), dir(Status))))
         # Or in other words...
         assert self.s_map['OK'] == 0
@@ -190,17 +190,17 @@ class Status(Exception):
 
         if isinstance(status, int):
             if status not in self.i_map.keys():
-                raise ValueError('Invalid status code - see %s.%s' %
+                raise ValueError("Invalid status code - see %s.%s" %
                   (__name__, self.__class__.__name__))
             self.status = status
         elif isinstance(status, str):
             if status.upper() not in self.s_map.keys():
-                raise ValueError('Invalid status code - see %s.%s' %
+                raise ValueError("Invalid status code - see %s.%s" %
                   (__name__, self.__class__.__name__))
             self.status = self.s_map[status.upper()]
         else:
             raise TypeError(
-              'Expected an int or str as status, but got %r instead' %
+              "Expected an int or str as status, but got %r instead" %
               status)
 
         self.msg = [None] * 4
@@ -216,13 +216,13 @@ class Status(Exception):
                 except IndexError:
                     pass
         if self.msg[3] is None:
-            self.msg[3] = '\n'.join((self.search_msg(1), '',
-              ''.join(traceback.format_tb(sys.exc_info()[2]))))
+            self.msg[3] = "\n".join((self.search_msg(1), "",
+              "".join(traceback.format_tb(sys.exc_info()[2]))))
 
         self.perfdata = perfdata
 
     def __repr__(self):
-        return '%s.%s(status=%r, msg=%r, perfdata=%r)' % (
+        return "%s.%s(status=%r, msg=%r, perfdata=%r)" % (
           self.__module__, self.__class__.__name__,
           self.status, self.msg, self.perfdata)
 
@@ -230,32 +230,30 @@ class Status(Exception):
         return self.output()
 
     def output(self, verbosity=0):
-        output = '%s: %s' % (
+        output = "%s: %s" % (
           self.i_map[self.status], self.search_msg(verbosity))
         if self.perfdata is not None:
-            output += ' |'
+            output += " |"
             for data in self.perfdata:
-                output += ' %s' % data
+                output += " %s" % data
         return output
 
     def search_msg(self, verbosity=0):
         if verbosity not in range(4):
-            raise ValueError('Verbosity should be one of 0, 1, 2, or 3')
+            raise ValueError("Verbosity should be one of 0, 1, 2, or 3")
         while self.msg[verbosity] is None and verbosity > 0:
             verbosity -= 1
         return self.msg[verbosity]
 
 class PerformanceMetric:
-    """
-    Class for storing individual performance data (perfdata) metrics.
-
+    """Stores individual performance data (perfdata) metrics.
 
     A collection of these objects can be passed as the perfdata
     parameter to Status to include perfdata in your check output.
-    """
 
-    def __init__(self, label, value, unit, warning_threshold='',
-    critical_threshold='', minimum='', maximum=''):
+    """
+    def __init__(self, label, value, unit, warning_threshold="",
+    critical_threshold="", minimum="", maximum=""):
         self.label = label
         self.value = value
         self.unit = unit
@@ -271,7 +269,7 @@ class PerformanceMetric:
         return self.output()
 
     def output(self):
-        return '%s=%s%s;%s;%s;%s;%s;' % (self.label, self.value,
+        return "%s=%s%s;%s;%s;%s;%s;" % (self.label, self.value,
         self.unit, self.warning_threshold, self.critical_threshold,
         self.minimum, self.maximum)
 
