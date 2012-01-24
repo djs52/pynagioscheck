@@ -160,8 +160,11 @@ class NagiosCheck(object):
     usage = "[options]"
     version = '0.1.0'
 
-    def __init__(self):
+    def __init__(self, out=sys.stdout, err=sys.stderr, exit_cb=sys.exit):
         self.options = []
+        self.out = out
+        self.err = err
+        self.exit_cb = exit_cb
         self.parser = optparse.OptionParser(
           usage="%%prog %s" % self.usage,
           version="%%prog %s" % self.version)
@@ -201,7 +204,7 @@ class NagiosCheck(object):
         comes hurtling down the pipe.
 
         """
-        sys.exit(2)
+        self.exit_cb(2)
 
     def run(self, argv=None):
         if argv is None:
@@ -230,20 +233,20 @@ class NagiosCheck(object):
             except UsageError, e:
                 msg = str(e)
                 if msg != "":
-                    print >>sys.stderr, "%s\n" % msg
+                    print >>self.err, "%s\n" % msg
                 self.parser.print_usage()
-                sys.exit(2)
+                self.exit_cb(2)
             except Status, e:
                 raise
             except SystemExit, e:
-                sys.exit(e.code)
+                self.exit_cb(e.code)
             except Exception, e:
                 raise Status(
                   'unknown', "Unhandled Python exception: %r" % e)
-            sys.exit(Status.EXIT_UNKNOWN)
+            self.exit_cb(Status.EXIT_UNKNOWN)
         except Status, s:
-            print s.output(self.verbosity)
-            sys.exit(s.status)
+            print >>self.out, s.output(self.verbosity)
+            self.exit_cb(s.status)
 
 class PerformanceMetric(object):
     """Stores individual performance data (perfdata) metrics.
