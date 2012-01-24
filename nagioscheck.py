@@ -24,7 +24,7 @@ class UsageError(Exception):
     def __str__(self):
         return self.msg
 
-class NagiosCheck:
+class NagiosCheck(object):
     """Subclass me and override `check()` to define your own Nagios
     check.
 
@@ -245,7 +245,7 @@ class Status(Exception):
             verbosity -= 1
         return self.msg[verbosity]
 
-class PerformanceMetric:
+class PerformanceMetric(object):
     """Stores individual performance data (perfdata) metrics.
 
     A collection of these objects can be passed as the perfdata
