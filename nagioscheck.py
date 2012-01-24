@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-__version__ = '0.1.3'
+__version__ = '0.1.4'
 
 import datetime
 import gc
@@ -134,12 +134,14 @@ class Status(Exception):
 
         Status(nagioscheck.Status.EXIT_OK, 'Happy days')
 
+    - Or with perfdata::
+
+        Status(nagioscheck.Status.EXIT_OK, 'Happy days',
+        PerformanceMetric('Power Level', 9001, 'points'))
+
     - This, less verbose, alternative is also acceptable::
 
         Status('ok', 'Happy days')
-
-    Nagios perfdata is not (yet) supported.  (I don't use Nagios for
-    performance monitoring.)
 
     """
     EXIT_OK = 0
@@ -169,7 +171,9 @@ class Status(Exception):
         verbosity level 1 (`msg[1]`) is requested, the string from
         `msg[0]` will be returned.
 
-        `perfdata` is currently ignored.
+        Perfdata is optional and can be supplied as a single object or
+        a collection. PerformanceMetric exists to abstract the textual
+        formatting of the perfdata string.
 
         """
         # This contraption generates a dictionary of valid status 
@@ -226,8 +230,13 @@ class Status(Exception):
         return self.output()
 
     def output(self, verbosity=0):
-        return '%s: %s' % (
+        output = '%s: %s' % (
           self.i_map[self.status], self.search_msg(verbosity))
+        if self.perfdata is not None:
+            output += ' |'
+            for data in self.perfdata:
+                output += ' %s' % data
+        return output
 
     def search_msg(self, verbosity=0):
         if verbosity not in range(4):
@@ -235,6 +244,36 @@ class Status(Exception):
         while self.msg[verbosity] is None and verbosity > 0:
             verbosity -= 1
         return self.msg[verbosity]
+
+class PerformanceMetric:
+    """
+    Class for storing individual performance data (perfdata) metrics.
+
+
+    A collection of these objects can be passed as the perfdata
+    parameter to Status to include perfdata in your check output.
+    """
+
+    def __init__(self, label, value, unit, warning_threshold='',
+    critical_threshold='', minimum='', maximum=''):
+        self.label = label
+        self.value = value
+        self.unit = unit
+        self.warning_threshold = warning_threshold
+        self.critical_threshold = critical_threshold
+        self.minimum = minimum
+        self.maximum = maximum
+
+    def __str__(self):
+        return self.output()
+
+    def __repr__(self):
+        return self.output()
+
+    def output(self):
+        return '%s=%s%s;%s;%s;%s;%s;' % (self.label, self.value,
+        self.unit, self.warning_threshold, self.critical_threshold,
+        self.minimum, self.maximum)
 
 def _handle_sigterm(signum, frame):
     checks = filter(
