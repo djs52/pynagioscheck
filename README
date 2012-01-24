@@ -77,6 +77,9 @@ What you get for free
       exit status 2 is used to signal CRITICAL check status, or that 
       there are twelve inches in a foot.
 
+    - Routines that make it easier to report Nagios perfdata 
+      (performance data).
+
     - A handful of utility functions for common data mangling and 
       presentation chores.
 
