@@ -9,122 +9,6 @@ import signal
 import sys
 import traceback
 
-class UsageError(Exception):
-    """Raise me from inside your check() method if the user has not 
-    supplied enough information to proceed.
-
-    """
-    def __init__(self, msg=""):
-        self.msg = str(msg)
-
-    def __repr__(self):
-        return "%s.%s(msg=%r)" % (
-          self.__module__, self.__class__.__name__, self.msg)
-
-    def __str__(self):
-        return self.msg
-
-class NagiosCheck(object):
-    """Subclass me and override `check()` to define your own Nagios
-    check.
-
-    See `examples/` for examples.
-
-    You *must* override the following from your subclass:
-
-    - `NagiosCheck.usage`:   Usage information for users.
-    - `NagiosCheck.version`: The release version of your check.
-    - `NagiosCheck.check()`: Actual check logic.
-
-    """
-    usage = "[options]"
-    version = '0.1.0'
-
-    def __init__(self):
-        self.options = []
-        self.parser = optparse.OptionParser(
-          usage="%%prog %s" % self.usage,
-          version="%%prog %s" % self.version)
-
-        # All checks must implement the following options as per the 
-        # Nagios plug-in development guidelines.
-        self.parser.add_option(
-          '-v', '--verbose', action='count', dest='verbosity')
-
-    def add_option(self, short, long=None, argument=False, desc=None):
-        option_strings = []
-        kwargs = {}
-
-        option_strings.append('-%s' % short)
-        if long is not None:
-            option_strings.append('--%s' % long)
-
-        if argument is None:
-            kwargs['action'] = 'store_true'
-            kwargs['dest'] = short
-        else:
-            kwargs['dest'] = argument
-        kwargs['help'] = desc
-
-        self.parser.add_option(*option_strings, **kwargs)
-
-    def check(self, opts, args):
-        raise NotImplementedError("You forgot to override check()!")
-
-    def expired(self):
-        """Our parent has died.  Follow suit.
-
-        Our parent has terminated, probably because a timeout had
-        recently expired.  You can override this method to clean up
-        after yourself, but do it quickly.  There is absolutely no
-        guarantee that you will get anywhere useful before a `SIGKILL`
-        comes hurtling down the pipe.
-
-        """
-        sys.exit(2)
-
-    def run(self, argv=None):
-        if argv is None:
-            argv = sys.argv
-        try:
-            try:
-                (opts, args) = self.parser.parse_args(argv[1:])
-
-                self.verbosity = getattr(opts, 'verbosity') or 0
-                if self.verbosity > 3:
-                    self.verbosity = 3
-
-                # When the NRPE server forks us (`popen(3)`) and its 
-                # guardian process dies from `command_timeout` expiry, 
-                # the process group should get `SIGTERM`'d.
-                old_handler = signal.getsignal(signal.SIGTERM)
-                signal.signal(signal.SIGTERM, _handle_sigterm)
-
-                self.check(opts, args)
-
-                signal.signal(signal.SIGTERM, old_handler)
-
-                raise Status('unknown',
-                  "%s.check() returned without raising %s.Status" %
-                  (self.__class__.__name__, __name__))
-            except UsageError, e:
-                msg = str(e)
-                if msg != "":
-                    print >>sys.stderr, "%s\n" % msg
-                self.parser.print_usage()
-                sys.exit(2)
-            except Status, e:
-                raise
-            except SystemExit, e:
-                sys.exit(e.code)
-            except Exception, e:
-                raise Status(
-                  'unknown', "Unhandled Python exception: %r" % e)
-            sys.exit(Status.EXIT_UNKNOWN)
-        except Status, s:
-            print s.output(self.verbosity)
-            sys.exit(s.status)
-
 class Status(Exception):
     """Stores check status.
 
@@ -244,6 +128,122 @@ class Status(Exception):
         while self.msg[verbosity] is None and verbosity > 0:
             verbosity -= 1
         return self.msg[verbosity]
+
+class UsageError(Exception):
+    """Raise me from inside your check() method if the user has not 
+    supplied enough information to proceed.
+
+    """
+    def __init__(self, msg=""):
+        self.msg = str(msg)
+
+    def __repr__(self):
+        return "%s.%s(msg=%r)" % (
+          self.__module__, self.__class__.__name__, self.msg)
+
+    def __str__(self):
+        return self.msg
+
+class NagiosCheck(object):
+    """Subclass me and override `check()` to define your own Nagios
+    check.
+
+    See `examples/` for examples.
+
+    You *must* override the following from your subclass:
+
+    - `NagiosCheck.usage`:   Usage information for users.
+    - `NagiosCheck.version`: The release version of your check.
+    - `NagiosCheck.check()`: Actual check logic.
+
+    """
+    usage = "[options]"
+    version = '0.1.0'
+
+    def __init__(self):
+        self.options = []
+        self.parser = optparse.OptionParser(
+          usage="%%prog %s" % self.usage,
+          version="%%prog %s" % self.version)
+
+        # All checks must implement the following options as per the 
+        # Nagios plug-in development guidelines.
+        self.parser.add_option(
+          '-v', '--verbose', action='count', dest='verbosity')
+
+    def add_option(self, short, long=None, argument=False, desc=None):
+        option_strings = []
+        kwargs = {}
+
+        option_strings.append('-%s' % short)
+        if long is not None:
+            option_strings.append('--%s' % long)
+
+        if argument is None:
+            kwargs['action'] = 'store_true'
+            kwargs['dest'] = short
+        else:
+            kwargs['dest'] = argument
+        kwargs['help'] = desc
+
+        self.parser.add_option(*option_strings, **kwargs)
+
+    def check(self, opts, args):
+        raise NotImplementedError("You forgot to override check()!")
+
+    def expired(self):
+        """Our parent has died.  Follow suit.
+
+        Our parent has terminated, probably because a timeout had
+        recently expired.  You can override this method to clean up
+        after yourself, but do it quickly.  There is absolutely no
+        guarantee that you will get anywhere useful before a `SIGKILL`
+        comes hurtling down the pipe.
+
+        """
+        sys.exit(2)
+
+    def run(self, argv=None):
+        if argv is None:
+            argv = sys.argv
+        try:
+            try:
+                (opts, args) = self.parser.parse_args(argv[1:])
+
+                self.verbosity = getattr(opts, 'verbosity') or 0
+                if self.verbosity > 3:
+                    self.verbosity = 3
+
+                # When the NRPE server forks us (`popen(3)`) and its 
+                # guardian process dies from `command_timeout` expiry, 
+                # the process group should get `SIGTERM`'d.
+                old_handler = signal.getsignal(signal.SIGTERM)
+                signal.signal(signal.SIGTERM, _handle_sigterm)
+
+                self.check(opts, args)
+
+                signal.signal(signal.SIGTERM, old_handler)
+
+                raise Status('unknown',
+                  "%s.check() returned without raising %s.Status" %
+                  (self.__class__.__name__, __name__))
+            except UsageError, e:
+                msg = str(e)
+                if msg != "":
+                    print >>sys.stderr, "%s\n" % msg
+                self.parser.print_usage()
+                sys.exit(2)
+            except Status, e:
+                raise
+            except SystemExit, e:
+                sys.exit(e.code)
+            except Exception, e:
+                raise Status(
+                  'unknown', "Unhandled Python exception: %r" % e)
+            sys.exit(Status.EXIT_UNKNOWN)
+        except Status, s:
+            print s.output(self.verbosity)
+            sys.exit(s.status)
 
 class PerformanceMetric(object):
     """Stores individual performance data (perfdata) metrics.
