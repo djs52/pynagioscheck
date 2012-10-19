@@ -1,3 +1,9 @@
+nagioscheck (0.1.6-1) unstable; urgency=low
+
+  * New release.
+
+ -- Saj Goonatilleke <sg@redu.cx>  Fri, 19 Oct 2012 16:46:12 +1100
+
 nagioscheck (0.1.5-1) unstable; urgency=low
 
   * New release.
