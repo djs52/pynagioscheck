@@ -1,7 +1,7 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name:           python-nagioscheck
-Version:        0.1.4
+Version:        0.1.5
 Release:        1%{?dist}
 Summary:        A Python framework for Nagios plug-in developers
 
@@ -43,6 +43,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Thu Oct 19 2012 Saj Goonatilleke <sg@redu.cx> - 0.1.5-1
+- New release.
+
 * Wed Jan 11 2012 Chris Deigan <chris@deigan.id.au> - 0.1.4-1
 - New release.
 
