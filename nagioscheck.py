@@ -263,7 +263,7 @@ class PerformanceMetric(object):
     parameter to Status to include perfdata in your check output.
 
     """
-    def __init__(self, label, value, unit, warning_threshold="",
+    def __init__(self, label, value, unit="", warning_threshold="",
                  critical_threshold="", minimum="", maximum=""):
         self.label = label
         self.value = value
