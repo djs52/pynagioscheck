@@ -60,6 +60,10 @@ class Status(Exception):
         formatting of the perfdata string.
 
         """
+        self.msg = [None] * 4
+        self.perfdata = None
+        self.status = self.EXIT_UNKNOWN
+
         # This contraption generates a dictionary of valid status 
         # constants from the `EXIT_*` class attributes defined at the 
         # very top of this class.  We use this dict for validation, and 
@@ -89,8 +93,6 @@ class Status(Exception):
             raise TypeError("Expected an int or str as status, but got "
                             "%r instead" % status)
 
-        self.msg = [None] * 4
-
         if isinstance(msg, str):
             self.msg[0] = msg
         elif isinstance(msg, list) or isinstance(msg, tuple):
@@ -108,7 +110,12 @@ class Status(Exception):
             self.msg[3] = "\n".join((self.search_msg(1), "",
                                      "".join(tb)))
 
-        self.perfdata = perfdata
+        if perfdata is not None:
+            try:
+                map(None, perfdata) # Test iterability
+                self.perfdata = perfdata
+            except TypeError:
+                self.perfdata = [perfdata]
 
     def __repr__(self):
         return ("%s.%s(status=%r, msg=%r, perfdata=%r)" %
