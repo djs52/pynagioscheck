@@ -77,7 +77,9 @@ class Status(Exception):
         assert self.s_map['OK'] == 0
 
         # And now the inverse...
-        self.i_map = dict((v, k) for k, v in self.s_map.iteritems())
+        self.i_map = {}
+        for k, v in self.s_map.iteritems():
+            self.i_map[v] = k
 
         if isinstance(status, int):
             if status not in self.i_map.keys():
