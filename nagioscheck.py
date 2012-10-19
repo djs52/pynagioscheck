@@ -16,22 +16,22 @@ class Status(Exception):
 
     - Without perfdata::
 
-        Status(nagioscheck.Status.EXIT_OK, "Happy days")
+          Status(nagioscheck.Status.EXIT_OK, "Happy days")
 
     - With perfdata::
 
-        Status(nagioscheck.Status.EXIT_OK, "Happy days",
-        PerformanceMetric('Power Level', 9001, 'points'))
+          Status(nagioscheck.Status.EXIT_OK, "Happy days",
+                 PerformanceMetric('Power Level', 9001, 'points'))
 
-    - This, less verbose, alternative is also acceptable::
+    - This (less verbose) alternative is also acceptable::
 
-        Status('ok', "Happy days")
+          Status('ok', "Happy days")
 
     """
-    EXIT_OK = 0
-    EXIT_WARNING = 1
+    EXIT_OK       = 0
+    EXIT_WARNING  = 1
     EXIT_CRITICAL = 2
-    EXIT_UNKNOWN = 3
+    EXIT_UNKNOWN  = 3
 
     def __init__(self, status, msg, perfdata=None):
         """Signal check status.
@@ -55,8 +55,8 @@ class Status(Exception):
         verbosity level 1 (`msg[1]`) is requested, the string from
         `msg[0]` will be returned.
 
-        Perfdata is optional and can be supplied as a single object or
-        a collection. PerformanceMetric exists to abstract the textual
+        Perfdata is optional and can be supplied as a single object or a 
+        collection.  PerformanceMetric exists to abstract the textual 
         formatting of the perfdata string.
 
         """
@@ -64,30 +64,33 @@ class Status(Exception):
         # constants from the `EXIT_*` class attributes defined at the 
         # very top of this class.  We use this dict for validation, and 
         # as a shortcut mechanism when a string is supplied as `status`.
-        self.s_map = dict(
-          map(lambda x: (x.replace('EXIT_', ""), getattr(Status, x),),
-          filter(lambda x: x.startswith('EXIT_'), dir(Status))))
+        self.s_map = dict(map(lambda x: (x.replace('EXIT_', ""),
+                                         getattr(Status, x),),
+                              filter(lambda x: x.startswith('EXIT_'),
+                                     dir(Status))))
+
         # Or in other words...
         assert self.s_map['OK'] == 0
+
         # And now the inverse...
         self.i_map = dict((v, k) for k, v in self.s_map.iteritems())
 
         if isinstance(status, int):
             if status not in self.i_map.keys():
                 raise ValueError("Invalid status code - see %s.%s" %
-                  (__name__, self.__class__.__name__))
+                                 (__name__, self.__class__.__name__))
             self.status = status
         elif isinstance(status, str):
             if status.upper() not in self.s_map.keys():
                 raise ValueError("Invalid status code - see %s.%s" %
-                  (__name__, self.__class__.__name__))
+                                 (__name__, self.__class__.__name__))
             self.status = self.s_map[status.upper()]
         else:
-            raise TypeError(
-              "Expected an int or str as status, but got %r instead" %
-              status)
+            raise TypeError("Expected an int or str as status, but got "
+                            "%r instead" % status)
 
         self.msg = [None] * 4
+
         if isinstance(msg, str):
             self.msg[0] = msg
         elif isinstance(msg, list) or isinstance(msg, tuple):
@@ -99,27 +102,32 @@ class Status(Exception):
                         self.msg[i] = str(msg[i])
                 except IndexError:
                     pass
+
         if self.msg[3] is None:
+            tb = traceback.format_tb(sys.exc_info()[2])
             self.msg[3] = "\n".join((self.search_msg(1), "",
-              "".join(traceback.format_tb(sys.exc_info()[2]))))
+                                     "".join(tb)))
 
         self.perfdata = perfdata
 
     def __repr__(self):
-        return "%s.%s(status=%r, msg=%r, perfdata=%r)" % (
-          self.__module__, self.__class__.__name__,
-          self.status, self.msg, self.perfdata)
+        return ("%s.%s(status=%r, msg=%r, perfdata=%r)" %
+                (self.__module__, self.__class__.__name__,
+                 self.status, self.msg, self.perfdata))
 
     def __str__(self):
         return self.output()
 
     def output(self, verbosity=0):
-        output = "%s: %s" % (
-          self.i_map[self.status], self.search_msg(verbosity))
+        output = ("%s: %s" %
+                  (self.i_map[self.status],
+                   self.search_msg(verbosity)))
+
         if self.perfdata is not None:
             output += " |"
             for data in self.perfdata:
                 output += " %s" % data
+
         return output
 
     def search_msg(self, verbosity=0):
@@ -138,8 +146,8 @@ class UsageError(Exception):
         self.msg = str(msg)
 
     def __repr__(self):
-        return "%s.%s(msg=%r)" % (
-          self.__module__, self.__class__.__name__, self.msg)
+        return ("%s.%s(msg=%r)" %
+                (self.__module__, self.__class__.__name__, self.msg))
 
     def __str__(self):
         return self.msg
@@ -165,14 +173,14 @@ class NagiosCheck(object):
         self.out = out
         self.err = err
         self.exit_cb = exit_cb
-        self.parser = optparse.OptionParser(
-          usage="%%prog %s" % self.usage,
-          version="%%prog %s" % self.version)
+        self.parser = (optparse.OptionParser(
+                       usage="%%prog %s" % self.usage,
+                       version="%%prog %s" % self.version))
 
         # All checks must implement the following options as per the 
         # Nagios plug-in development guidelines.
-        self.parser.add_option(
-          '-v', '--verbose', action='count', dest='verbosity')
+        self.parser.add_option('-v', '--verbose', action='count',
+                               dest='verbosity')
 
     def add_option(self, short, long=None, argument=False, desc=None):
         option_strings = []
@@ -227,9 +235,9 @@ class NagiosCheck(object):
 
                 signal.signal(signal.SIGTERM, old_handler)
 
-                raise Status('unknown',
-                  "%s.check() returned without raising %s.Status" %
-                  (self.__class__.__name__, __name__))
+                raise Status('unknown', "%s.check() returned without "
+                             "raising %s.Status" %
+                             (self.__class__.__name__, __name__))
             except UsageError, e:
                 msg = str(e)
                 if msg != "":
@@ -241,8 +249,8 @@ class NagiosCheck(object):
             except SystemExit, e:
                 self.exit_cb(e.code)
             except Exception, e:
-                raise Status(
-                  'unknown', "Unhandled Python exception: %r" % e)
+                raise Status('unknown',
+                             "Unhandled Python exception: %r" % e)
             self.exit_cb(Status.EXIT_UNKNOWN)
         except Status, s:
             print >>self.out, s.output(self.verbosity)
@@ -256,7 +264,7 @@ class PerformanceMetric(object):
 
     """
     def __init__(self, label, value, unit, warning_threshold="",
-    critical_threshold="", minimum="", maximum=""):
+                 critical_threshold="", minimum="", maximum=""):
         self.label = label
         self.value = value
         self.unit = unit
@@ -272,13 +280,14 @@ class PerformanceMetric(object):
         return self.output()
 
     def output(self):
-        return "%s=%s%s;%s;%s;%s;%s;" % (self.label, self.value,
-        self.unit, self.warning_threshold, self.critical_threshold,
-        self.minimum, self.maximum)
+        return ("%s=%s%s;%s;%s;%s;%s;" %
+                (self.label, self.value, self.unit,
+                 self.warning_threshold, self.critical_threshold,
+                 self.minimum, self.maximum))
 
 def _handle_sigterm(signum, frame):
-    checks = filter(
-      lambda o: isinstance(o, NagiosCheck), gc.get_objects())
+    checks = filter(lambda o: isinstance(o, NagiosCheck),
+                    gc.get_objects())
     for check in checks:
         check.expired()
 
