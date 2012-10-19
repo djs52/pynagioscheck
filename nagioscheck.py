@@ -126,14 +126,19 @@ class Status(Exception):
         return self.output()
 
     def output(self, verbosity=0):
-        output = ("%s: %s" %
-                  (self.i_map[self.status],
-                   self.search_msg(verbosity)))
+        output_bare = ("%s: %s" %
+                       (self.i_map[self.status],
+                        self.search_msg(verbosity)))
 
+        output_lines = output_bare.split("\n")
+
+        # Append perfdata to the first line of plugin output only.
         if self.perfdata is not None:
-            output += " |"
+            output_lines[0] += " |"
             for data in self.perfdata:
-                output += " %s" % data
+                output_lines[0] += " %s" % data
+
+        output = "\n".join(output_lines)
 
         return output
 

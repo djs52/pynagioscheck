@@ -22,6 +22,7 @@ class NagiosCheckTest(object):
                              raise_exception_on_exit).run(argv)
         finally:
             self.out = self.outio.getvalue()
+            self.out_lines = self.out.split("\n")
 
 def raise_exception_on_exit(code):
     """Raise an exception instead of exiting fo' real."""
