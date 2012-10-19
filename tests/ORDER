@@ -1,1 +1,2 @@
-tests/test_minimal.py
+tests/test_ok.py
+tests/test_critical.py
