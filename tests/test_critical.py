@@ -24,14 +24,14 @@ class TestCritical(NagiosCheckTest):
             assert e.code == Status.EXIT_CRITICAL
             raise
 
-    def test_critical_opens_with_status_prefix(self):
+    def test_critical_does_not_open_with_status_prefix(self):
         self.check_class = SimplePessimisticCheck
         try:
             self.run_check()
         except WouldHaveExitNonZero:
             pass
 
-        assert self.out.startswith("CRITICAL:")
+        assert not self.out.startswith("CRITICAL:")
 
     def test_critical_output_contains_message(self):
         self.check_class = SimplePessimisticCheck

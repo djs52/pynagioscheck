@@ -128,9 +128,7 @@ class Status(Exception):
         return self.output()
 
     def output(self, verbosity=0):
-        output_bare = ("%s: %s" %
-                       (self.i_map[self.status],
-                        self.search_msg(verbosity)))
+        output_bare = self.search_msg(verbosity)
 
         output_lines = output_bare.split("\n")
 

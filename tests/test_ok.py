@@ -13,11 +13,11 @@ class SimpleOptimisticCheck(NagiosCheck):
         raise Status('ok', self.msg)
 
 class TestOk(NagiosCheckTest):
-    def test_ok_opens_with_status_prefix(self):
+    def test_ok_does_not_open_with_status_prefix(self):
         self.check_class = SimpleOptimisticCheck
         self.run_check()
 
-        assert self.out.startswith("OK:")
+        assert not self.out.startswith("OK:")
 
     def test_ok_output_contains_message(self):
         self.check_class = SimpleOptimisticCheck
